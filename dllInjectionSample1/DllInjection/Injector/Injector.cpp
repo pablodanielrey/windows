@@ -3,9 +3,12 @@
 
 #include "stdafx.h"
 #include "windows.h"
+#include "tlhelp32.h"
+#include "stdio.h"
+#include "iostream"
 
 /*
-Thanks Zer0Mem0ry
+Zer0Mem0ry
 https://youtu.be/IBwoVUR1gt8
 */
 
@@ -18,12 +21,14 @@ bool injectDynamicLibrary(DWORD processId, char *dllPath) {
 		// aloco memoria en el proceso destino para guardar el path a la libreria y copio la ruta
 		LPVOID lPath = VirtualAllocEx(hTargetProcess, 0, strlen(dllPath) + 1, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 		if (lPath == 0) {
+			CloseHandle(hTargetProcess);
 			return false;
 		}
 		WriteProcessMemory(hTargetProcess, lPath, (LPVOID)dllPath, strlen(dllPath) + 1, 0);
 
 		HANDLE remoteThread = CreateRemoteThread(hTargetProcess, 0, 0, (LPTHREAD_START_ROUTINE)loadLibAddr, lPath, 0, 0);
 		if (remoteThread == 0) {
+			CloseHandle(hTargetProcess);
 			return false;
 		}
 		WaitForSingleObject(remoteThread, INFINITE);
@@ -39,11 +44,44 @@ bool injectDynamicLibrary(DWORD processId, char *dllPath) {
 	return false;
 }
 
+DWORD getProcessByName(wchar_t *name) {
 
-int main()
+	HANDLE hpsn = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hpsn == INVALID_HANDLE_VALUE) {
+		return 0;
+	}
+	__try {
+		PROCESSENTRY32 pe32;
+		pe32.dwSize = sizeof(PROCESSENTRY32);
+
+		if (Process32First(hpsn, &pe32) == TRUE) {
+			while (Process32Next(hpsn, &pe32) == TRUE) {
+				std::wcout << "Proceso : " << pe32.szExeFile << "pid : " << pe32.th32ProcessID << L"\n";
+				if (_wcsicmp(pe32.szExeFile, name) == 0) {
+					DWORD hProcess = pe32.th32ProcessID;
+					return hProcess;
+				}
+			}
+		}
+
+		return 0;
+	}
+	__finally {
+		CloseHandle(hpsn);
+	}
+
+}
+
+
+int wmain(int argc, wchar_t **argv)
 {
-	DWORD pId = 0;
-	injectDynamicLibrary(pId, "DllInjection.dll");
-    return 0;
+	if (argc >= 2) {
+		wchar_t *name = argv[1];
+		std::wcout << "Buscando : " << name << "\n";
+		printf("%d", getProcessByName(name));
+		//injectDynamicLibrary(pId, "DllInjection.dll");
+		return 0;
+	}
+	return 1;
 }
 
