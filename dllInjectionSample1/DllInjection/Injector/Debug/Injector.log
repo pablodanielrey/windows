@@ -1,4 +1,1 @@
-﻿  stdafx.cpp
-  Injector.cpp
-  Injector.vcxproj -> C:\Users\user\Source\Repos\windows\dllInjectionSample1\DllInjection\Debug\Injector.exe
-c:\users\user\source\repos\windows\dllinjectionsample1\dllinjection\injector\injector.cpp(16): warning C6387: 'Temp_value_#96' could be '0':  this does not adhere to the specification for the function 'GetProcAddress'. 
+﻿
