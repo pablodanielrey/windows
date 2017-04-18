@@ -6,32 +6,40 @@
 #include "tlhelp32.h"
 #include "stdio.h"
 #include "iostream"
+#include "string"
 
 /*
 Zer0Mem0ry
 https://youtu.be/IBwoVUR1gt8
 */
 
-bool injectDynamicLibrary(DWORD processId, char *dllPath) {
+bool injectDynamicLibrary(DWORD processId, const wchar_t *dllPath) {
 	HANDLE hTargetProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, processId);
 	if (hTargetProcess) {
 		// cargo la dir de LoadLibraryA en nuestro proceso. se supone que es la misma en todos los procesos.
-		LPVOID loadLibAddr = (LPVOID)GetProcAddress(GetModuleHandleA("kernel32.dll"), "LoadLibraryA");
+		LPVOID loadLibAddr = (LPVOID)GetProcAddress(GetModuleHandle(L"kernel32.dll"), "LoadLibraryW");
+		std::wcout << "Ubicación de LoadLibrary == " << loadLibAddr << "\n";
 
+		size_t strlen = (lstrlenW(dllPath) + 1) * sizeof(wchar_t);
+		std::wcout << "Longitud a reservar de memoria : " << strlen << "\n";
+		
 		// aloco memoria en el proceso destino para guardar el path a la libreria y copio la ruta
-		LPVOID lPath = VirtualAllocEx(hTargetProcess, 0, strlen(dllPath) + 1, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+		LPVOID lPath = VirtualAllocEx(hTargetProcess, 0, strlen, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 		if (lPath == 0) {
 			CloseHandle(hTargetProcess);
 			return false;
 		}
-		WriteProcessMemory(hTargetProcess, lPath, (LPVOID)dllPath, strlen(dllPath) + 1, 0);
+		std::wcout << "Proceso : " << hTargetProcess << " Ubicación alocada : " << lPath << "\n";
+		WriteProcessMemory(hTargetProcess, lPath, (LPVOID)dllPath, strlen, 0);
 
 		HANDLE remoteThread = CreateRemoteThread(hTargetProcess, 0, 0, (LPTHREAD_START_ROUTINE)loadLibAddr, lPath, 0, 0);
 		if (remoteThread == 0) {
 			CloseHandle(hTargetProcess);
 			return false;
 		}
-		WaitForSingleObject(remoteThread, INFINITE);
+		std::wcout << "Remote Thread : " << remoteThread << "\n";
+		DWORD ret = WaitForSingleObject(remoteThread, INFINITE);
+		std::wcout << "Retorno del thread : " << ret << "\n";
 
 		// libero recursos
 		//VirtualFreeEx(hTargetProcess, lPath, strlen(dllPath) + 1, MEM_RELEASE);
@@ -76,10 +84,14 @@ DWORD getProcessByName(wchar_t *name) {
 int wmain(int argc, wchar_t **argv)
 {
 	if (argc >= 2) {
+		const wchar_t *dllPath = L"C:\\Users\\user\\Source\\Repos\\windows\\dllInjectionSample1\\DllInjection\\x64\\Debug\\DllInjection.dll";
 		wchar_t *name = argv[1];
-		std::wcout << "Buscando : " << name << "\n";
-		printf("%d", getProcessByName(name));
-		//injectDynamicLibrary(pId, "DllInjection.dll");
+		std::wcout << L"Buscando : " << name << "\n";
+		DWORD pId = getProcessByName(name);
+		std::wcout << L"Injectando dll en el proceso con id " << pId << "\n";
+		if (injectDynamicLibrary(pId, dllPath)) {
+			std::wcout << L"Librería injectada\n";
+		}
 		return 0;
 	}
 	return 1;

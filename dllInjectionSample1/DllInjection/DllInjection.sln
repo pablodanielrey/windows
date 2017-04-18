@@ -5,7 +5,9 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DllInjection", "DllInjection\DllInjection.vcxproj", "{18A71163-D1F0-4F48-836A-E52190B4A0F9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Injector", "Injector\Injector.vcxproj", "{BE516B8E-98B1-4667-8990-43D1F371C7AB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Injector64", "Injector\Injector.vcxproj", "{BE516B8E-98B1-4667-8990-43D1F371C7AB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestApp", "TestApp\TestApp.vcxproj", "{EE8F5B57-4AF9-4B49-AB42-08BC68902F20}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,14 @@ Global
 		{BE516B8E-98B1-4667-8990-43D1F371C7AB}.Release|x64.Build.0 = Release|x64
 		{BE516B8E-98B1-4667-8990-43D1F371C7AB}.Release|x86.ActiveCfg = Release|Win32
 		{BE516B8E-98B1-4667-8990-43D1F371C7AB}.Release|x86.Build.0 = Release|Win32
+		{EE8F5B57-4AF9-4B49-AB42-08BC68902F20}.Debug|x64.ActiveCfg = Debug|x64
+		{EE8F5B57-4AF9-4B49-AB42-08BC68902F20}.Debug|x64.Build.0 = Debug|x64
+		{EE8F5B57-4AF9-4B49-AB42-08BC68902F20}.Debug|x86.ActiveCfg = Debug|Win32
+		{EE8F5B57-4AF9-4B49-AB42-08BC68902F20}.Debug|x86.Build.0 = Debug|Win32
+		{EE8F5B57-4AF9-4B49-AB42-08BC68902F20}.Release|x64.ActiveCfg = Release|x64
+		{EE8F5B57-4AF9-4B49-AB42-08BC68902F20}.Release|x64.Build.0 = Release|x64
+		{EE8F5B57-4AF9-4B49-AB42-08BC68902F20}.Release|x86.ActiveCfg = Release|Win32
+		{EE8F5B57-4AF9-4B49-AB42-08BC68902F20}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
